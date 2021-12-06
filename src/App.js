@@ -1,57 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import { Seeker } from './features/Seeker/Seeker';
+import { useForm } from './hooks/hooks'
+import { useSelector, useDispatch } from 'react-redux';
+import { seekerData, fetchNewsAsync, deleteNew } from './features/Seeker/seekerSlice'
+import { NewsList } from './features/News/News';
+import { Box, Grid, CircularProgress } from '@mui/material';
 
 function App() {
+
+  const { formData, handleInputChange } = useForm({ new: '' })
+  const { data, fetching, error } = useSelector(seekerData);
+  const dispatch = useDispatch();
+
+  const onClickSearchNew = () => {
+    dispatch(fetchNewsAsync(formData.new))
+  }
+
+  const deleteNewFunc = (index) => {
+    dispatch(deleteNew(index))
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+    <>
+      <Box mt={5} mb={5}>
+        <Seeker onChange={handleInputChange} onClick={onClickSearchNew} />
+      </Box>
+      {fetching
+        ? <Grid container justifyContent="center"><Grid item><CircularProgress /></Grid></Grid>
+        : <NewsList articles={data} deleteNew={deleteNewFunc} />
+      }
+    </>
   );
 }
 
